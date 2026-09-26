@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 환경변수 (API 키, DB 비밀번호) ###
+# 추가: 비밀 정보가 GitHub에 올라가지 않도록 제외
+.env
