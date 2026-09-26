@@ -54,10 +54,22 @@
           </div>
         </div>
 
-        <div class="search-field">
+        <!-- 일정 필드랑 똑같은 패턴: readonly input 클릭하면 팝업 열림 -->
+        <div class="search-field guest-field" id="guest-field">
           <label>인원</label>
-          <input type="text" placeholder="인원 2">
+          <input type="text" id="guest-display" value="인원 2" readonly onclick="toggleGuestPopup()">
+
+          <div class="guest-popup hidden" id="guest-popup">
+            <p class="guest-popup-title">인원</p>
+            <p class="guest-popup-desc">유아 및 아동도 인원수에 포함해주세요.</p>
+            <div class="guest-counter">
+              <button type="button" class="guest-btn minus" onclick="changeGuestCount(-1)">−</button>
+              <span class="guest-count" id="guest-count">2</span>
+              <button type="button" class="guest-btn plus" onclick="changeGuestCount(1)">+</button>
+            </div>
+          </div>
         </div>
+
         <button type="submit" class="search-btn">검색</button>
       </form>
     </div>
@@ -69,7 +81,7 @@
     <section class="section" id="domestic-destinations">
       <h2 class="section-title">국내 인기 여행지</h2>
       <div class="chip-row">
-        <button type="button" class="chip" data-filter="제주도" onclick="jumpToLocation(this)">
+        <button type="button" class="chip" data-filter="제주" onclick="jumpToLocation(this)">
           <img th:src="@{'https://picsum.photos/seed/domestic1/300/300'}" alt="제주도">
           <span>제주도</span>
         </button>

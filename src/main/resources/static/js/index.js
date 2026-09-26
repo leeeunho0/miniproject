@@ -254,6 +254,28 @@ function formatDateShort(date) {
   return `${date.getMonth() + 1}.${date.getDate()} ${WEEKDAY_LABELS[date.getDay()]}`;
 }
 
+// ================= 인원 선택 =================
+let guestCount = 2;
+const GUEST_MIN = 1;
+const GUEST_MAX = 20; // 최대 인원 임의로 지정
+
+function toggleGuestPopup() {
+  document.getElementById('guest-popup').classList.toggle('hidden');
+}
+
+function changeGuestCount(diff) {
+  guestCount = Math.min(GUEST_MAX, Math.max(GUEST_MIN, guestCount + diff));
+  updateGuestDisplay();
+}
+
+// 숫자/입력창 텍스트 갱신 + 최소/최대 도달 시 버튼 비활성화
+function updateGuestDisplay() {
+  document.getElementById('guest-count').textContent = guestCount;
+  document.getElementById('guest-display').value = `인원 ${guestCount}`;
+  document.querySelector('.guest-btn.minus').disabled = (guestCount <= GUEST_MIN);
+  document.querySelector('.guest-btn.plus').disabled = (guestCount >= GUEST_MAX);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   tagRegions();
 
@@ -269,14 +291,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('hotel-section').scrollIntoView({ behavior: 'smooth' });
   });
 
-  // 달력 바깥 클릭하면 팝업 닫기
+  // 달력 / 인원 팝업 바깥 클릭하면 각각 닫기
   document.addEventListener('click', (e) => {
-    const field = document.getElementById('date-field');
-    const popup = document.getElementById('date-calendar-popup');
-    if (!field.contains(e.target)) {
-      popup.classList.add('hidden');
-    }
+    const dateField = document.getElementById('date-field');
+    const datePopup = document.getElementById('date-calendar-popup');
+    if (!dateField.contains(e.target)) datePopup.classList.add('hidden');
+
+    const guestField = document.getElementById('guest-field');
+    const guestPopup = document.getElementById('guest-popup');
+    if (!guestField.contains(e.target)) guestPopup.classList.add('hidden');
   });
+
+  updateGuestDisplay(); // 처음 로드될 때 버튼 disabled 상태 맞춰줌
 
   switchView('domestic'); // 첫 화면은 국내 숙소 기준으로 시작
 });
