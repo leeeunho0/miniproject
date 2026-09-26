@@ -1,11 +1,155 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>국내호텔 해외호텔까지</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/index.css}">
 </head>
 <body>
-  
+
+  <!-- ===== 히어로 + 검색바 ===== -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1 class="hero-title">국내부터 해외까지</h1>
+
+      <div class="stay-type-toggle">
+        <button type="button" class="stay-type active" data-type="domestic">
+          <span class="stay-type-icon">🏢</span>
+          <span>국내 숙소</span>
+        </button>
+        <button type="button" class="stay-type" data-type="overseas">
+          <span class="stay-type-icon">🏠</span>
+          <span>해외 숙소</span>
+        </button>
+      </div>
+
+      <form class="search-bar" onsubmit="return false;">
+        <div class="search-field">
+          <label>여행지</label>
+          <input type="text" placeholder="국내 지역·명소, 지하철역, 숙소명">
+        </div>
+        <div class="search-field">
+          <label>일정</label>
+          <input type="text" placeholder="날짜를 선택하세요">
+        </div>
+        <div class="search-field">
+          <label>인원</label>
+          <input type="text" placeholder="인원 2">
+        </div>
+        <button type="submit" class="search-btn">검색</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <!-- ===== 국내 인기 여행지 ===== -->
+    <section class="section" id="domestic-destinations">
+      <h2 class="section-title">국내 인기 여행지</h2>
+      <div class="chip-row">
+        <button type="button" class="chip" data-filter="제주도" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/domestic1/300/300'}" alt="제주도">
+          <span>제주도</span>
+        </button>
+        <button type="button" class="chip" data-filter="서울" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/domestic2/300/300'}" alt="서울">
+          <span>서울</span>
+        </button>
+        <button type="button" class="chip" data-filter="부산" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/domestic3/300/300'}" alt="부산">
+          <span>부산</span>
+        </button>
+        <button type="button" class="chip" data-filter="강릉" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/domestic4/300/300'}" alt="강릉">
+          <span>강릉</span>
+        </button>
+        <button type="button" class="chip" data-filter="인천" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/domestic5/300/300'}" alt="인천">
+          <span>인천</span>
+        </button>
+        <button type="button" class="chip" data-filter="경주" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/domestic6/300/300'}" alt="경주">
+          <span>경주</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== 해외 인기 여행지 ===== -->
+    <section class="section hidden" id="overseas-destinations">
+      <h2 class="section-title">해외 인기 여행지</h2>
+      <div class="chip-row">
+        <button type="button" class="chip" data-filter="오사카" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/overseas1/300/300'}" alt="오사카">
+          <span>오사카</span>
+        </button>
+        <button type="button" class="chip" data-filter="도쿄" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/overseas2/300/300'}" alt="도쿄">
+          <span>도쿄 / 롱쿄</span>
+        </button>
+        <button type="button" class="chip" data-filter="파리" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/overseas3/300/300'}" alt="파리">
+          <span>파리</span>
+        </button>
+        <button type="button" class="chip" data-filter="니스" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/overseas4/300/300'}" alt="니스">
+          <span>니스</span>
+        </button>
+        <button type="button" class="chip" data-filter="런던" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/overseas5/300/300'}" alt="런던">
+          <span>런던</span>
+        </button>
+        <button type="button" class="chip" data-filter="교토" onclick="jumpToLocation(this)">
+          <img th:src="@{'https://picsum.photos/seed/overseas6/300/300'}" alt="교토">
+          <span>교토</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== 인기 추천 숙소 ===== -->
+    <section class="section" id="hotel-section">
+      <h2 class="section-title" id="hotel-section-title">인기 추천 숙소</h2>
+
+      <div class="tab-bar" id="tab-bar">
+        <button type="button" class="tab active" data-filter="전체" onclick="filterHotels(this)">전체</button>
+        <button type="button" class="tab" th:each="loc : ${locationList}"
+                th:text="${loc}" th:attr="data-filter=${loc}"
+                onclick="filterHotels(this)"></button>
+      </div>
+
+      <div class="card-row" id="card-row">
+        <div class="hotel-card" th:each="hotel : ${hotelList}" th:attr="data-location=${hotel.location}">
+          <div class="hotel-thumb">
+            <img th:src="@{'/images/hotels/hotel' + ${hotel.hotelId} + '.png'}"
+                 th:alt="${hotel.name}">
+            <span class="hotel-location-badge" th:text="${hotel.location}">지역</span>
+          </div>
+          <div class="hotel-body">
+            <h3 class="hotel-name" th:text="${hotel.name}">호텔명</h3>
+            <p class="hotel-desc" th:text="${hotel.decription}">설명</p>
+            <p class="hotel-price">
+              <strong th:text="${#numbers.formatInteger(hotel.price, 3, 'COMMA')}">0</strong>원
+              <span class="hotel-price-note">/ 1박</span>
+            </p>
+          </div>
+        </div>
+
+        <p class="empty-hint" th:if="${#lists.isEmpty(hotelList)}">
+          아직 등록된 숙소가 없어요. <a href="/dummy-init">더미데이터 넣기</a>
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== 푸터 ===== -->
+  <footer class="footer">
+    <p>Exchange 여행 숙소 예약 데모 · 학습용 프로젝트</p>
+  </footer>
+
+  <script th:src="@{/js/index.js}"></script>
+
 </body>
 </html>
