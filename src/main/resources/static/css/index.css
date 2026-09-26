@@ -346,6 +346,137 @@ img {
   text-align: center;
 }
 
+/* ===== 일정 선택 달력 ===== */
+.date-field {
+  position: relative;
+}
+
+.date-calendar-popup {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 50;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+  padding: 20px 24px;
+  width: 640px;
+  color: var(--color-text);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.calendar-nav {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  font-size: 16px;
+  line-height: 1;
+  color: var(--color-text-sub);
+  flex-shrink: 0;
+}
+
+.calendar-nav:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.calendar-months {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+}
+
+.calendar-month {
+  flex: 1;
+}
+
+.calendar-title {
+  font-weight: 700;
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.calendar-table th {
+  font-size: 12px;
+  color: var(--color-text-sub);
+  font-weight: 500;
+  padding-bottom: 6px;
+}
+
+.calendar-table td {
+  text-align: center;
+  padding: 2px 0;
+}
+
+.cal-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cal-day:hover {
+  background: var(--color-bg);
+}
+
+.cal-day.sunday {
+  color: #ef4444;
+}
+
+.cal-day.disabled {
+  color: #d1d5db;
+  cursor: default;
+  pointer-events: none;
+}
+
+.cal-day.selected {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.cal-day.in-range {
+  background: #dbeafe;
+  border-radius: 0;
+}
+
+.calendar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-text-sub);
+}
+
+.calendar-reset {
+  color: var(--color-text-sub);
+  font-weight: 500;
+}
+
+.calendar-reset:hover {
+  color: var(--color-primary);
+}
+
 /* ===== 모바일 대응 ===== */
 @media (max-width: 640px) {
   .hero-title {

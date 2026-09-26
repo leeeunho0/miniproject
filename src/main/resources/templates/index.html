@@ -32,10 +32,28 @@
           <label>여행지</label>
           <input type="text" id="keyword-input" placeholder="국내 지역·명소, 지하철역, 숙소명">
         </div>
-        <div class="search-field">
+
+        <!-- 기존엔 그냥 text input이었는데, readonly + 클릭 이벤트로 바꾸고 그 안에 달력 팝업을 넣음 -->
+        <div class="search-field date-field" id="date-field">
           <label>일정</label>
-          <input type="text" placeholder="날짜를 선택하세요">
+          <input type="text" id="date-display" placeholder="날짜를 선택하세요" readonly onclick="toggleDateCalendar()">
+
+          <div class="date-calendar-popup hidden" id="date-calendar-popup">
+            <div class="calendar-header">
+              <button type="button" class="calendar-nav" onclick="moveCalendarMonth(-1)">‹</button>
+              <div class="calendar-months">
+                <div class="calendar-month" id="calendar-month-0"></div>
+                <div class="calendar-month" id="calendar-month-1"></div>
+              </div>
+              <button type="button" class="calendar-nav" onclick="moveCalendarMonth(1)">›</button>
+            </div>
+            <div class="calendar-footer">
+              <button type="button" class="calendar-reset" onclick="resetDateSelection()">↺ 초기화</button>
+              <span class="calendar-summary" id="calendar-summary">체크인 - 체크아웃 날짜를 선택하세요</span>
+            </div>
+          </div>
         </div>
+
         <div class="search-field">
           <label>인원</label>
           <input type="text" placeholder="인원 2">

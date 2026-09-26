@@ -20,7 +20,7 @@ const OVERSEAS_LOCATIONS = [
 
 let currentRegion = 'domestic'; // 'domestic' | 'overseas'
 let currentFilter = '전체';
-let currentKeyword = ''; // 검색어 상태 추가
+let currentKeyword = ''; // 검색어 상태
 
 // 각 숙소 카드/탭에 국내(domestic)·해외(overseas) 태그를 붙임
 function tagRegions() {
@@ -125,6 +125,135 @@ function switchView(region) {
   applyCardVisibility();
 }
 
+// ================= 일정 선택 달력 =================
+const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+
+let calendarBaseMonth = new Date(); // 왼쪽에 보여줄 기준 달 (오늘이 속한 달부터 시작)
+calendarBaseMonth.setDate(1);
+let selectedStart = null; // 체크인 Date
+let selectedEnd = null;   // 체크아웃 Date
+
+function toggleDateCalendar() {
+  const popup = document.getElementById('date-calendar-popup');
+  if (popup.classList.contains('hidden')) {
+    renderCalendar();
+    popup.classList.remove('hidden');
+  } else {
+    popup.classList.add('hidden');
+  }
+}
+
+function moveCalendarMonth(diff) {
+  calendarBaseMonth.setMonth(calendarBaseMonth.getMonth() + diff);
+  renderCalendar();
+}
+
+// 왼쪽 달, 오른쪽 달(왼쪽 달 + 1개월) 두 개를 각각 그림
+function renderCalendar() {
+  renderMonth(document.getElementById('calendar-month-0'), calendarBaseMonth.getFullYear(), calendarBaseMonth.getMonth());
+
+  const next = new Date(calendarBaseMonth);
+  next.setMonth(next.getMonth() + 1);
+  renderMonth(document.getElementById('calendar-month-1'), next.getFullYear(), next.getMonth());
+}
+
+// 한 달치 달력을 <table>로 만들어서 컨테이너에 넣음
+function renderMonth(container, year, month) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const firstDay = new Date(year, month, 1);
+  const lastDate = new Date(year, month + 1, 0).getDate(); // 그 달의 마지막 날짜
+  const startWeekday = firstDay.getDay(); // 1일이 무슨 요일인지 (0=일 ~ 6=토)
+
+  let html = `<div class="calendar-title">${year}년 ${month + 1}월</div>`;
+  html += '<table class="calendar-table"><thead><tr>';
+  WEEKDAY_LABELS.forEach(w => html += `<th>${w}</th>`);
+  html += '</tr></thead><tbody><tr>';
+
+  // 1일 요일 전까지는 빈 칸으로 채워서 요일 줄을 맞춤
+  for (let i = 0; i < startWeekday; i++) html += '<td></td>';
+
+  let weekday = startWeekday;
+  for (let date = 1; date <= lastDate; date++) {
+    const current = new Date(year, month, date);
+    const isPast = current < today; // 오늘 이전 날짜는 선택 불가
+
+    const classes = ['cal-day'];
+    if (weekday === 0) classes.push('sunday');
+    if (isPast) classes.push('disabled');
+    if (selectedStart && isSameDate(current, selectedStart)) classes.push('selected');
+    if (selectedEnd && isSameDate(current, selectedEnd)) classes.push('selected');
+    if (selectedStart && selectedEnd && current > selectedStart && current < selectedEnd) classes.push('in-range');
+
+    const clickAttr = isPast ? '' : `onclick="onDayClick(${year}, ${month}, ${date})"`;
+    html += `<td><span class="${classes.join(' ')}" ${clickAttr}>${date}</span></td>`;
+
+    weekday++;
+    if (weekday === 7) { html += '</tr><tr>'; weekday = 0; }
+  }
+  html += '</tr></tbody></table>';
+
+  container.innerHTML = html;
+}
+
+function isSameDate(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+// 체크인/체크아웃 두 번 클릭으로 기간을 정하는 로직
+// 1) 아무것도 선택 안 됐거나, 이미 둘 다 선택된 상태 -> 새로 체크인부터 다시 시작
+// 2) 체크인만 있는 상태에서 그보다 나중 날짜 클릭 -> 체크아웃으로 확정
+// 3) 체크인보다 이전 날짜를 클릭 -> 체크인을 그 날짜로 다시 잡음
+function onDayClick(year, month, date) {
+  const clicked = new Date(year, month, date);
+
+  if (!selectedStart || (selectedStart && selectedEnd)) {
+    selectedStart = clicked;
+    selectedEnd = null;
+  } else if (clicked > selectedStart) {
+    selectedEnd = clicked;
+  } else {
+    selectedStart = clicked;
+  }
+
+  renderCalendar();
+  updateDateSummary();
+}
+
+function resetDateSelection() {
+  selectedStart = null;
+  selectedEnd = null;
+  renderCalendar();
+  updateDateSummary();
+}
+
+// 입력창 + 팝업 하단 요약을 "9.26 토 - 9.27 일 (1박)" 형태로 갱신
+function updateDateSummary() {
+  const summaryEl = document.getElementById('calendar-summary');
+  const displayInput = document.getElementById('date-display');
+
+  if (!selectedStart) {
+    summaryEl.textContent = '체크인 - 체크아웃 날짜를 선택하세요';
+    displayInput.value = '';
+    return;
+  }
+  if (!selectedEnd) {
+    summaryEl.textContent = `${formatDateShort(selectedStart)} 체크인 (체크아웃 날짜를 선택하세요)`;
+    displayInput.value = formatDateShort(selectedStart);
+    return;
+  }
+
+  const nights = Math.round((selectedEnd - selectedStart) / (1000 * 60 * 60 * 24));
+  const text = `${formatDateShort(selectedStart)} - ${formatDateShort(selectedEnd)} (${nights}박)`;
+  summaryEl.textContent = text;
+  displayInput.value = text;
+}
+
+function formatDateShort(date) {
+  return `${date.getMonth() + 1}.${date.getDate()} ${WEEKDAY_LABELS[date.getDay()]}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   tagRegions();
 
@@ -138,6 +267,15 @@ document.addEventListener('DOMContentLoaded', () => {
     currentKeyword = document.getElementById('keyword-input').value.trim();
     applyCardVisibility();
     document.getElementById('hotel-section').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // 달력 바깥 클릭하면 팝업 닫기
+  document.addEventListener('click', (e) => {
+    const field = document.getElementById('date-field');
+    const popup = document.getElementById('date-calendar-popup');
+    if (!field.contains(e.target)) {
+      popup.classList.add('hidden');
+    }
   });
 
   switchView('domestic'); // 첫 화면은 국내 숙소 기준으로 시작
