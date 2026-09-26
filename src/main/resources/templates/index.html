@@ -151,7 +151,9 @@
       </div>
 
       <div class="card-row" id="card-row">
-        <div class="hotel-card" th:each="hotel : ${hotelList}" th:attr="data-location=${hotel.location}">
+        <div class="hotel-card" th:each="hotel : ${hotelList}"
+             th:attr="data-location=${hotel.location},data-id=${hotel.hotelId},data-name=${hotel.name},data-desc=${hotel.decription},data-price=${hotel.price}"
+             onclick="openHotelModal(this)">
           <div class="hotel-thumb">
             <img th:src="@{'/images/hotels/hotel' + ${hotel.hotelId} + '.png'}"
                  th:alt="${hotel.name}">
@@ -182,6 +184,65 @@
   <footer class="footer">
     <p>Exchange 여행 숙소 예약 데모 · 학습용 프로젝트</p>
   </footer>
+
+  <!-- ===== 호텔 상세 정보 모달 ===== -->
+  <div class="modal-overlay hidden" id="hotel-modal-overlay">
+    <div class="modal-box hotel-modal-box">
+      <button type="button" class="modal-close" id="hotel-modal-close" aria-label="닫기">&times;</button>
+      <div class="hotel-modal-title" id="hotel-modal-name">호텔명</div>
+
+      <div class="hotel-modal-body">
+        <img id="hotel-modal-image" class="hotel-modal-image" src="" alt="">
+
+        <div class="hotel-modal-price-box">
+          <p class="hotel-modal-price-line">
+            <span id="hotel-modal-nights">2박</span>
+            <strong id="hotel-modal-unit-price">₩0</strong>
+            <span id="hotel-modal-multiplier">X 2</span>
+          </p>
+          <p class="hotel-modal-total">총액 <strong id="hotel-modal-total-price">₩0</strong></p>
+
+          <div class="hotel-modal-dates">
+            <div>
+              <span class="hotel-modal-date-label">체크인</span>
+              <strong id="hotel-modal-checkin"></strong>
+            </div>
+            <div>
+              <span class="hotel-modal-date-label">체크아웃</span>
+              <strong id="hotel-modal-checkout"></strong>
+            </div>
+          </div>
+
+          <div class="hotel-modal-guest">
+            <span class="hotel-modal-date-label">인원</span>
+            <strong id="hotel-modal-guest-count">게스트 1명</strong>
+          </div>
+
+          <p class="hotel-modal-cancel-note"></p>
+
+          <!-- 예약하기 버튼 클릭시 alert -->
+          <button type="button" class="hotel-modal-reserve-btn" onclick="confirmReservation()">예약하기</button>
+          <p class="hotel-modal-notice">예약 확정 전에는 요금이 청구되지 않습니다.</p>
+        </div>
+      </div>
+
+      <div class="hotel-modal-amenities">
+        <h4>인기 시설 및 서비스</h4>
+        <div class="amenity-grid">
+          <span>🚭 금연 객실</span>
+          <span>📶 무료 Wi-Fi</span>
+          <span>👨‍👩‍👧 가족 객실</span>
+          <span>🕐 24시간 프런트 데스크</span>
+          <span>🛗 엘리베이터</span>
+          <span>🔥 난방 시설</span>
+          <span>🌳 정원</span>
+          <span>🧹 하우스키핑 (매일)</span>
+          <span>❄️ 에어컨</span>
+          <span>🍳 최고의 조식</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script th:src="@{/js/index.js}"></script>
 

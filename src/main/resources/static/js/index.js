@@ -186,7 +186,8 @@ function renderMonth(container, year, month) {
     if (selectedEnd && isSameDate(current, selectedEnd)) classes.push('selected');
     if (selectedStart && selectedEnd && current > selectedStart && current < selectedEnd) classes.push('in-range');
 
-    const clickAttr = isPast ? '' : `onclick="onDayClick(${year}, ${month}, ${date})"`;
+    // event 인자 추가: 클릭 시 이벤트 버블링을 막기 위해 onDayClick에 넘겨줌
+    const clickAttr = isPast ? '' : `onclick="onDayClick(${year}, ${month}, ${date}, event)"`;
     html += `<td><span class="${classes.join(' ')}" ${clickAttr}>${date}</span></td>`;
 
     weekday++;
@@ -205,7 +206,10 @@ function isSameDate(a, b) {
 // 1) 아무것도 선택 안 됐거나, 이미 둘 다 선택된 상태 -> 새로 체크인부터 다시 시작
 // 2) 체크인만 있는 상태에서 그보다 나중 날짜 클릭 -> 체크아웃으로 확정
 // 3) 체크인보다 이전 날짜를 클릭 -> 체크인을 그 날짜로 다시 잡음
-function onDayClick(year, month, date) {
+function onDayClick(year, month, date, event) {
+  event.stopPropagation(); // 달력 다시 그릴 때 클릭한 엘리먼트가 detach되면서
+                            // "바깥 클릭"으로 오인돼 팝업이 닫히는 것 방지
+
   const clicked = new Date(year, month, date);
 
   if (!selectedStart || (selectedStart && selectedEnd)) {
@@ -219,6 +223,11 @@ function onDayClick(year, month, date) {
 
   renderCalendar();
   updateDateSummary();
+
+  // 체크인 + 체크아웃이 둘 다 정해졌을 때(=마지막 날짜 클릭)만 팝업 자동으로 닫기
+  if (selectedStart && selectedEnd) {
+    document.getElementById('date-calendar-popup').classList.add('hidden');
+  }
 }
 
 function resetDateSelection() {
@@ -276,6 +285,64 @@ function updateGuestDisplay() {
   document.querySelector('.guest-btn.plus').disabled = (guestCount >= GUEST_MAX);
 }
 
+// ================= 호텔 상세 모달 =================
+// 상단에서 실제로 선택한 일정/인원이 있으면 그대로 가져다 씀 (없으면 오늘+7일, 2박, 1명 기본값)
+function openHotelModal(card) {
+  const id = card.dataset.id;
+  const name = card.dataset.name;
+  const price = Number(card.dataset.price);
+
+  document.getElementById('hotel-modal-name').textContent = name;
+
+  const image = document.getElementById('hotel-modal-image');
+  image.src = `/images/hotels/hotel${id}.png`;
+  image.alt = name;
+
+  let checkin, checkout;
+  if (selectedStart && selectedEnd) {
+    checkin = selectedStart;
+    checkout = selectedEnd;
+  } else {
+    checkin = new Date();
+    checkin.setDate(checkin.getDate() + 7);
+    checkout = new Date(checkin);
+    checkout.setDate(checkout.getDate() + 2);
+  }
+
+  // 실제 선택한 체크인/체크아웃 날짜 차이로 박수를 계산해서 "2박" 고정값 대신 씀 (최소 1박)
+  const nights = Math.max(1, Math.round((checkout - checkin) / (1000 * 60 * 60 * 24)));
+
+  document.getElementById('hotel-modal-nights').textContent = `${nights}박`;
+  document.getElementById('hotel-modal-multiplier').textContent = `X ${nights}`;
+  document.getElementById('hotel-modal-unit-price').textContent = '₩' + price.toLocaleString();
+  document.getElementById('hotel-modal-total-price').textContent = '₩' + (price * nights).toLocaleString();
+
+  const formatFull = d => `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
+  document.getElementById('hotel-modal-checkin').textContent = formatFull(checkin);
+  document.getElementById('hotel-modal-checkout').textContent = formatFull(checkout);
+
+  // 무료 취소 기한 = 체크인 30일 전
+  const cancelDeadline = new Date(checkin);
+  cancelDeadline.setDate(cancelDeadline.getDate() - 30);
+  document.querySelector('.hotel-modal-cancel-note').textContent =
+    `${cancelDeadline.getMonth() + 1}월 ${cancelDeadline.getDate()}일 전까지 무료 취소 가능`;
+
+  document.getElementById('hotel-modal-guest-count').textContent = `게스트 ${guestCount}명`;
+
+  document.getElementById('hotel-modal-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeHotelModal() {
+  document.getElementById('hotel-modal-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// 예약하기 클릭 시 완료 메시지만 띄움 (실제 DB 저장 로직은 없음)
+function confirmReservation() {
+  alert('예약되었습니다!');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   tagRegions();
 
@@ -300,6 +367,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const guestField = document.getElementById('guest-field');
     const guestPopup = document.getElementById('guest-popup');
     if (!guestField.contains(e.target)) guestPopup.classList.add('hidden');
+  });
+
+  // 호텔 상세 모달 닫기 이벤트
+  document.getElementById('hotel-modal-close').addEventListener('click', closeHotelModal);
+  document.getElementById('hotel-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'hotel-modal-overlay') closeHotelModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeHotelModal();
   });
 
   updateGuestDisplay(); // 처음 로드될 때 버튼 disabled 상태 맞춰줌
