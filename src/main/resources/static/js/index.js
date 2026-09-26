@@ -20,6 +20,7 @@ const OVERSEAS_LOCATIONS = [
 
 let currentRegion = 'domestic'; // 'domestic' | 'overseas'
 let currentFilter = '전체';
+let currentKeyword = ''; // 검색어 상태 추가
 
 // 각 숙소 카드/탭에 국내(domestic)·해외(overseas) 태그를 붙임
 function tagRegions() {
@@ -35,13 +36,31 @@ function tagRegions() {
   });
 }
 
-// 현재 region + filter 조건에 맞는 카드만 보이게 처리
+// 현재 region + filter + keyword 조건을 모두 만족하는 카드만 보이게 처리
 function applyCardVisibility() {
+  let visibleCount = 0;
+
   document.querySelectorAll('#card-row .hotel-card').forEach(card => {
     const regionMatch = card.dataset.region === currentRegion;
     const filterMatch = (currentFilter === '전체' || card.getAttribute('data-location') === currentFilter);
-    card.style.display = (regionMatch && filterMatch) ? '' : 'none';
+
+    // 검색어가 있으면 호텔명/설명/지역명에 포함되는지 검사 (없으면 통과)
+    let keywordMatch = true;
+    if (currentKeyword) {
+      const name = card.querySelector('.hotel-name')?.textContent || '';
+      const desc = card.querySelector('.hotel-desc')?.textContent || '';
+      const location = card.getAttribute('data-location') || '';
+      keywordMatch = (name + location + desc).includes(currentKeyword);
+    }
+
+    const visible = regionMatch && filterMatch && keywordMatch;
+    card.style.display = visible ? '' : 'none';
+    if (visible) visibleCount++;
   });
+
+  // 검색 결과가 하나도 없을 때만 안내 문구 노출
+  const emptyHint = document.getElementById('search-empty-hint');
+  if (emptyHint) emptyHint.style.display = (currentKeyword && visibleCount === 0) ? '' : 'none';
 }
 
 // 현재 region에 해당하는 지역 탭만 보이게 처리 ("전체" 탭은 항상 보임)
@@ -81,6 +100,8 @@ function jumpToLocation(chip) {
 function switchView(region) {
   currentRegion = region;
   currentFilter = '전체';
+  currentKeyword = ''; // 지역 토글 시 검색어도 같이 초기화
+  document.getElementById('keyword-input').value = '';
 
   // 토글 버튼 활성 표시
   document.querySelectorAll('.stay-type').forEach(btn => {
@@ -109,6 +130,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('.stay-type[data-type]').forEach(btn => {
     btn.addEventListener('click', () => switchView(btn.dataset.type));
+  });
+
+  // 검색 폼 제출 시 서버로 안 보내고 화면에서 바로 필터링
+  document.getElementById('search-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    currentKeyword = document.getElementById('keyword-input').value.trim();
+    applyCardVisibility();
+    document.getElementById('hotel-section').scrollIntoView({ behavior: 'smooth' });
   });
 
   switchView('domestic'); // 첫 화면은 국내 숙소 기준으로 시작

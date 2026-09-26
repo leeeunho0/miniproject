@@ -26,10 +26,11 @@
         </button>
       </div>
 
-      <form class="search-bar" onsubmit="return false;">
+      <!-- id 추가 + onsubmit 제거: 서버로 안 보내고 JS(search-form submit)에서 직접 필터링 처리 -->
+      <form class="search-bar" id="search-form">
         <div class="search-field">
           <label>여행지</label>
-          <input type="text" placeholder="국내 지역·명소, 지하철역, 숙소명">
+          <input type="text" id="keyword-input" placeholder="국내 지역·명소, 지하철역, 숙소명">
         </div>
         <div class="search-field">
           <label>일정</label>
@@ -135,6 +136,9 @@
             </p>
           </div>
         </div>
+
+        <!-- 검색 결과가 0개일 때만 JS로 보여줌 (서버가 내려준 hotelList 자체가 빈 것과는 다른 케이스) -->
+        <p class="empty-hint" id="search-empty-hint" style="display:none;">검색 결과가 없어요.</p>
 
         <p class="empty-hint" th:if="${#lists.isEmpty(hotelList)}">
           아직 등록된 숙소가 없어요. <a href="/dummy-init">더미데이터 넣기</a>
