@@ -704,6 +704,22 @@ img {
   color: var(--color-text);
 }
 
+/* ===== 환율정보 모달 ===== */
+.exchange-modal-box {
+  width: 60vw;
+  height: 90vh;
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+.exchange-modal-box .modal-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
 /* ===== 모바일 대응 ===== */
 @media (max-width: 640px) {
   .hero-title {

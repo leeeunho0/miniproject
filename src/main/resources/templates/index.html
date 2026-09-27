@@ -24,6 +24,11 @@
           <span class="stay-type-icon">🏠</span>
           <span>해외 숙소</span>
         </button>
+        <!-- 클릭하면 /exchange를 모달로 띄워줌 -->
+        <button type="button" class="stay-type" id="exchange-btn" onclick="openExchangeModal()">
+          <span class="stay-type-icon">💲</span>
+          <span>환율정보</span>
+        </button>
       </div>
 
       <!-- id 추가 + onsubmit 제거: 서버로 안 보내고 JS(search-form submit)에서 직접 필터링 처리 -->
@@ -220,7 +225,6 @@
 
           <p class="hotel-modal-cancel-note"></p>
 
-          <!-- 예약하기 버튼 클릭시 alert -->
           <button type="button" class="hotel-modal-reserve-btn" onclick="confirmReservation()">예약하기</button>
           <p class="hotel-modal-notice">예약 확정 전에는 요금이 청구되지 않습니다.</p>
         </div>
@@ -241,6 +245,14 @@
           <span>🍳 최고의 조식</span>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== 환율정보 모달 ===== -->
+  <div class="modal-overlay hidden" id="exchange-modal-overlay">
+    <div class="modal-box exchange-modal-box">
+      <button type="button" class="modal-close" id="exchange-modal-close" aria-label="닫기">&times;</button>
+      <iframe id="exchange-modal-iframe" class="modal-iframe" title="환율정보" src=""></iframe>
     </div>
   </div>
 

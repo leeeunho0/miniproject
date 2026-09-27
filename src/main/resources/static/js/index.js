@@ -125,6 +125,22 @@ function switchView(region) {
   applyCardVisibility();
 }
 
+// ================= 환율정보 모달 =================
+// iframe으로 /exchange를 그대로 불러옴 (innerHTML로 넣으면 안의 <script>가 실행이 안 돼서 iframe 사용)
+function openExchangeModal() {
+  const overlay = document.getElementById('exchange-modal-overlay');
+  const iframe = document.getElementById('exchange-modal-iframe');
+  iframe.src = '/exchange'; // 열 때마다 새로 불러와서 최신 정보로 갱신
+  overlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeExchangeModal() {
+  document.getElementById('exchange-modal-overlay').classList.add('hidden');
+  document.getElementById('exchange-modal-iframe').src = ''; // 백그라운드 정리
+  document.body.style.overflow = '';
+}
+
 // ================= 일정 선택 달력 =================
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -374,8 +390,18 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('hotel-modal-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'hotel-modal-overlay') closeHotelModal();
   });
+
+  // 환율정보 모달 닫기 이벤트
+  document.getElementById('exchange-modal-close').addEventListener('click', closeExchangeModal);
+  document.getElementById('exchange-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'exchange-modal-overlay') closeExchangeModal();
+  });
+
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeHotelModal();
+    if (e.key === 'Escape') {
+      closeHotelModal();
+      closeExchangeModal();
+    }
   });
 
   updateGuestDisplay(); // 처음 로드될 때 버튼 disabled 상태 맞춰줌
