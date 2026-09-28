@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -15,9 +16,12 @@ import com.yonsai.HotelReservation.repository.ExchangeRepository;
 @Service
 public class ExchangeService {
 
-  //1. 환율데이터 가져오기!
-  private String PUBLIC_URL = "https://oapi.koreaexim.go.kr/site/program/financial/exchangeJSON";
-  private String PUBLIC_API_KEY ="oevS02SAC98Abv9ri8p3gGnONlbkBOOv";
+  //1. 환율데이터 가져오기! -> application.properties(.env) 값을 주입받게 변경
+  @Value("${PUBLIC_URL}")
+  private String PUBLIC_URL;
+
+  @Value("${PUBLIC_API_KEY}")
+  private String PUBLIC_API_KEY;
 
   //2. 실제 일처리하는 함수
   public List<ExchangeEntity> ExchangeData(){
