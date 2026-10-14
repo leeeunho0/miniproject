@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 | 호텔 예약</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- 결제 페이지 디자인 (static/css/payment.css) -->
+  <link rel="stylesheet" th:href="@{/css/payment.css}">
+
+  <!-- 토스페이먼츠 SDK: payment.js보다 먼저 불러와야 TossPayments를 쓸 수 있음 -->
+  <script src="https://js.tosspayments.com/v2/standard"></script>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">HOTEL RESERVATION</p>
+    <h1>결제 정보</h1>
+    <p class="description">예약 주문 내용을 확인해 주세요.</p>
+
+    <!-- Controller가 넘긴 값을 숨겨진 input에 담아 JS에서 꺼내 씀 -->
+    <input type="hidden" id="hotelId" th:value="${hotelId}">
+    <input type="hidden" id="clientKey" th:value="${clientKey}">
+
+    <dl>
+      <div class="summary-row">
+        <dt>주문명</dt>
+        <dd id="orderName">결제하기를 누르면 표시됩니다</dd>
+      </div>
+      <div class="summary-row">
+        <dt>주문번호</dt>
+        <dd id="orderId">-</dd>
+      </div>
+      <div class="summary-row amount-row">
+        <dt>결제 금액</dt>
+        <dd id="amount">-</dd>
+      </div>
+    </dl>
+
+    <button class="pay-btn" id="payBtn">결제하기</button>
+
+    <p class="notice">테스트 결제 환경입니다. 실제 금액은 청구되지 않습니다.</p>
+    <a class="back-link" th:href="@{/}">숙소 목록으로 돌아가기</a>
+  </main>
+
+  <script th:src="@{/js/payment.js}"></script>
+</body>
+</html>

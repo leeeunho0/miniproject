@@ -1,0 +1,91 @@
+:root {
+  color-scheme: light;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #202923;
+  background: #f3f6f2;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(ellipse at top left, #e1eee3, transparent 55%), #f3f6f2;
+}
+
+/* 가운데 결제 카드 */
+main {
+  width: min(100%, 520px);
+  padding: 36px;
+  border: 1px solid #dce4dc;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 18px 48px rgb(35 58 41 / 8%);
+}
+
+.eyebrow { margin: 0 0 8px; color: #397450; font-size: 13px; font-weight: 700; }
+h1 { margin: 0; font-size: 28px; }
+.description { margin: 10px 0 28px; color: #66736a; line-height: 1.7; }
+
+/* 주문 정보 목록 */
+dl { margin: 0; border-top: 1px solid #e7ece7; }
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 17px 0;
+  border-bottom: 1px solid #e7ece7;
+}
+
+dt { color: #66736a; }
+dd { margin: 0; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+.amount-row dd { color: #276640; font-size: 20px; }
+
+/* 결제 버튼 */
+.pay-btn {
+  width: 100%;
+  margin-top: 24px;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #276640;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.pay-btn:hover { background: #1f5434; }
+
+/* 안내 문구 */
+.notice {
+  margin: 22px 0 0;
+  padding: 14px 16px;
+  border-left: 3px solid #78a486;
+  background: #f2f7f2;
+  color: #526257;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 목록으로 돌아가기 */
+.back-link {
+  display: block;
+  margin-top: 24px;
+  color: #276640;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+.back-link:hover { text-decoration: underline; }
+
+/* 모바일 화면 */
+@media (max-width: 480px) {
+  main { padding: 26px 22px; }
+  h1 { font-size: 24px; }
+}
