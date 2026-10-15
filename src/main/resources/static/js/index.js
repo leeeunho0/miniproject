@@ -21,6 +21,8 @@ const OVERSEAS_LOCATIONS = [
 let currentRegion = 'domestic'; // 'domestic' | 'overseas'
 let currentFilter = '전체';
 let currentKeyword = ''; // 검색어 상태
+let currentHotelId = null; // 지금 모달에 열려 있는 숙소 id (예약하기에서 사용)
+let currentNights = 1;     // 지금 모달에 표시된 박수 (예약하기에서 사용)
 
 // 각 숙소 카드/탭에 국내(domestic)·해외(overseas) 태그를 붙임
 function tagRegions() {
@@ -328,6 +330,10 @@ function openHotelModal(card) {
   // 실제 선택한 체크인/체크아웃 날짜 차이로 박수를 계산해서 "2박" 고정값 대신 씀 (최소 1박)
   const nights = Math.max(1, Math.round((checkout - checkin) / (1000 * 60 * 60 * 24)));
 
+  // 예약하기를 눌렀을 때 결제 페이지로 넘길 값 저장
+  currentHotelId = id;
+  currentNights = nights;
+
   document.getElementById('hotel-modal-nights').textContent = `${nights}박`;
   document.getElementById('hotel-modal-multiplier').textContent = `X ${nights}`;
   document.getElementById('hotel-modal-unit-price').textContent = '₩' + price.toLocaleString();
@@ -354,9 +360,9 @@ function closeHotelModal() {
   document.body.style.overflow = '';
 }
 
-// 예약하기 클릭 시 완료 메시지만 띄움 (실제 DB 저장 로직은 없음)
+// 예약하기 클릭 → 지금 모달에 열린 숙소와 박수를 가지고 결제 페이지로 이동
 function confirmReservation() {
-  alert('예약되었습니다!');
+  location.href = `/payment/${currentHotelId}?nights=${currentNights}`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

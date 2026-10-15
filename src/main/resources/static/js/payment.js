@@ -1,5 +1,6 @@
 // HTML의 숨겨진 input에서 Controller가 넘긴 값 꺼내기
 const hotelId = document.getElementById("hotelId").value;
+const nights = document.getElementById("nights").value;
 const clientKey = document.getElementById("clientKey").value;
 
 // 토스 SDK 초기화 → 결제창 인스턴스 생성 (비회원 결제)
@@ -9,8 +10,8 @@ const payment = tossPayments.payment({ customerKey: TossPayments.ANONYMOUS });
 // [결제하기] 토스 결제창으로 실제 결제 흐름 진행
 document.getElementById("payBtn").onclick = function () {
 
-  // ① 결제 준비 API 호출: 서버가 DB 가격으로 금액을 정하고 READY로 저장
-  fetch(`/payments/prepare/${hotelId}`, { method: "POST" })
+  // ① 결제 준비 API 호출: 서버가 DB 1박 가격 × 박수로 금액을 정하고 READY로 저장
+  fetch(`/payments/prepare/${hotelId}?nights=${nights}`, { method: "POST" })
     .then(res => {
       if (!res.ok) throw new Error(res.status); // 500, 404면 에러로
       return res.json();
@@ -41,7 +42,7 @@ document.getElementById("payBtn").onclick = function () {
 document.getElementById("testPayBtn").onclick = function () {
 
   // ① 결제 준비 API 호출 (실제 결제와 똑같이 서버가 금액을 정하고 READY로 저장)
-  fetch(`/payments/prepare/${hotelId}`, { method: "POST" })
+  fetch(`/payments/prepare/${hotelId}?nights=${nights}`, { method: "POST" })
     .then(res => {
       if (!res.ok) throw new Error(res.status);
       return res.json();
