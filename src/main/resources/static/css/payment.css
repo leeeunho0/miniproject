@@ -62,6 +62,15 @@ dd { margin: 0; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
 }
 .pay-btn:hover { background: #1f5434; }
 
+/* 테스트 결제 버튼: 흰 배경 + 초록 테두리로 기본 결제 버튼과 구분 */
+.test-btn {
+  margin-top: 10px;
+  background: #fff;
+  color: #276640;
+  border: 1px solid #276640;
+}
+.test-btn:hover { background: #f2f7f2; }
+
 /* 안내 문구 */
 .notice {
   margin: 22px 0 0;

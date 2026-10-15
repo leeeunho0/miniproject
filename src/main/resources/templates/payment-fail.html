@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 실패 | 호텔 예약</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/payment.css}">
+</head>
+<body>
+  <main>
+    <p class="eyebrow">PAYMENT FAILED</p>
+    <h1>결제에 실패했습니다</h1>
+    <!-- Controller가 넘긴 실패 사유 표시 -->
+    <p class="description" th:text="${message}">결제가 취소되었습니다.</p>
+
+    <a class="back-link" th:href="@{/}">숙소 목록으로 돌아가기</a>
+  </main>
+</body>
+</html>

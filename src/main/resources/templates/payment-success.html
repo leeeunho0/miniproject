@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 완료 | 호텔 예약</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <!-- 결제 페이지와 같은 디자인 재사용 -->
+  <link rel="stylesheet" th:href="@{/css/payment.css}">
+</head>
+<body>
+  <main>
+    <p class="eyebrow">PAYMENT COMPLETE</p>
+    <h1>결제가 완료되었습니다</h1>
+    <p class="description">이용해 주셔서 감사합니다.</p>
+
+    <dl>
+      <div class="summary-row">
+        <dt>숙소</dt>
+        <dd th:text="${payment.hotel.name}">숙소명</dd>
+      </div>
+      <div class="summary-row">
+        <dt>주문번호</dt>
+        <dd th:text="${payment.orderId}">주문번호</dd>
+      </div>
+      <div class="summary-row">
+        <dt>결제 일시</dt>
+        <dd th:text="${payment.paidAt}">결제 일시</dd>
+      </div>
+      <div class="summary-row amount-row">
+        <dt>결제 금액</dt>
+        <dd id="amount" th:text="${payment.amount}">0</dd>
+      </div>
+    </dl>
+
+    <a class="back-link" th:href="@{/}">숙소 목록으로 돌아가기</a>
+  </main>
+
+  <script>
+    // 서버가 넘긴 금액(예: 120000.0)을 숫자로 바꾼 뒤 콤마 형식으로 표시
+    const amountEl = document.getElementById("amount");
+    amountEl.innerText = Number(amountEl.innerText).toLocaleString() + "원";
+  </script>
+</body>
+</html>
