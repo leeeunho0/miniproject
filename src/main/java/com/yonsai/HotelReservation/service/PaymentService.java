@@ -126,6 +126,11 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
+    // 결제 내역 페이지: 전체 결제 목록 (최신순)
+    public List<Payment> findAll() {
+        return paymentRepository.findAllByOrderByIdDesc();
+    }
+
     // 결제창에서 사용자가 취소하거나 실패했을 때: READY 주문을 CANCELED로 변경
     public void cancelByUser(String orderId) {
 

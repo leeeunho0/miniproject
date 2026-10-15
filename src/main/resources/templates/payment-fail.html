@@ -14,6 +14,7 @@
     <!-- Controller가 넘긴 실패 사유 표시 -->
     <p class="description" th:text="${message}">결제가 취소되었습니다.</p>
 
+    <a class="back-link" th:href="@{/payment/list}">결제 내역 보기</a>
     <a class="back-link" th:href="@{/}">숙소 목록으로 돌아가기</a>
   </main>
 </body>

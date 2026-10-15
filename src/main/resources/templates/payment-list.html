@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 내역 | 호텔 예약</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <!-- 결제 페이지 공통 디자인 + 목록 전용 디자인 -->
+  <link rel="stylesheet" th:href="@{/css/payment.css}">
+  <link rel="stylesheet" th:href="@{/css/payment-list.css}">
+</head>
+<body>
+  <main class="list-main">
+    <p class="eyebrow">PAYMENT HISTORY</p>
+    <h1>결제 내역</h1>
+    <p class="description">최근 결제 순으로 주문 상태를 확인할 수 있습니다.</p>
+
+    <!-- 결제가 하나도 없을 때 -->
+    <p class="empty" th:if="${#lists.isEmpty(payments)}">결제 내역이 없습니다.</p>
+
+    <div class="table-wrap" th:unless="${#lists.isEmpty(payments)}">
+      <table>
+        <thead>
+          <tr>
+            <th>번호</th>
+            <th>숙소</th>
+            <th>금액</th>
+            <th>상태</th>
+            <th>주문 일시</th>
+            <th>결제 일시</th>
+            <th>주문번호</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- th:each: Controller가 넘긴 payments 목록을 하나씩 꺼내 한 줄씩 출력 -->
+          <tr th:each="p : ${payments}">
+            <td th:text="${p.id}">1</td>
+            <td th:text="${p.hotel.name}">숙소명</td>
+            <!-- 금액은 아래 JS에서 콤마 형식으로 바꿈 -->
+            <td class="amount" th:text="${p.amount}">0</td>
+            <td>
+              <!-- 상태값(DONE 등)을 class로 붙여서 상태별 색상 적용 -->
+              <span class="badge" th:classappend="${p.status}" th:switch="${p.status}">
+                <span th:case="'READY'">결제 대기</span>
+                <span th:case="'DONE'">결제 완료</span>
+                <span th:case="'FAILED'">결제 실패</span>
+                <span th:case="'CANCELED'">결제 취소</span>
+                <span th:case="'EXPIRED'">시간 만료</span>
+                <span th:case="'UNKNOWN'">확인 중</span>
+                <span th:case="*" th:text="${p.status}">기타</span>
+              </span>
+            </td>
+            <td th:text="${#temporals.format(p.createdAt, 'MM-dd HH:mm')}">10-15 10:30</td>
+            <!-- 결제 전이면 paidAt이 비어 있으므로 '-' 표시 -->
+            <td th:text="${p.paidAt != null} ? ${#temporals.format(p.paidAt, 'MM-dd HH:mm')} : '-'">-</td>
+            <!-- 주문번호는 길어서 앞 8자리만 보여주고, 마우스를 올리면 전체 표시 -->
+            <td class="order-id" th:text="${#strings.substring(p.orderId, 0, 8)}" th:title="${p.orderId}">bb2b4d2e</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <a class="back-link" th:href="@{/}">숙소 목록으로 돌아가기</a>
+  </main>
+
+  <script>
+    // 금액(예: 280000.0)을 숫자로 바꾼 뒤 콤마 형식으로 표시
+    document.querySelectorAll(".amount").forEach(el => {
+      el.innerText = Number(el.innerText).toLocaleString() + "원";
+    });
+  </script>
+</body>
+</html>
