@@ -6,9 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.NoSuchElementException;
 
 @Controller
 @RequiredArgsConstructor
@@ -41,17 +44,23 @@ public class PaymentPageController {
         Payment payment = paymentService.confirm(paymentKey, orderId, amount);
         model.addAttribute("payment", payment);
 
-        // 승인까지 끝나면 완료 화면, 금액 불일치나 승인 실패면 실패 화면
+        // 승인까지 끝나면 완료 화면, 그 외 상태는 상태별 안내 문구와 함께 실패 화면
         if ("DONE".equals(payment.getStatus())) {
             return "payment-success";
         }
-        model.addAttribute("message", "결제 승인에 실패했습니다.");
+        model.addAttribute("message", failMessage(payment.getStatus()));
         return "payment-fail";
     }
 
-    // 결제창에서 취소하거나 실패했을 때 토스가 이동시키는 주소 (실패 사유 message가 함께 옴)
+    // 결제창에서 취소하거나 실패했을 때 토스가 이동시키는 주소 (code, message, orderId가 함께 옴)
     @GetMapping("/payment/fail")
-    public String fail(@RequestParam String message, Model model) {
+    public String fail(@RequestParam String message,
+                       @RequestParam String orderId,
+                       Model model) {
+
+        // READY로 남아 있는 주문을 CANCELED로 정리
+        paymentService.cancelByUser(orderId);
+
         model.addAttribute("message", message);
         return "payment-fail";
     }
@@ -65,11 +74,44 @@ public class PaymentPageController {
         Payment payment = paymentService.mockConfirm(orderId, amount);
         model.addAttribute("payment", payment);
 
-        // 금액 검증까지 통과하면 완료 화면, 아니면 실패 화면
         if ("DONE".equals(payment.getStatus())) {
             return "payment-success";
         }
-        model.addAttribute("message", "결제 금액이 일치하지 않습니다.");
+        model.addAttribute("message", failMessage(payment.getStatus()));
+        return "payment-fail";
+    }
+
+    // 주문 상태별로 실패 화면에 보여줄 문구
+    private String failMessage(String status) {
+        if ("FAILED".equals(status)) {
+            return "결제 승인에 실패했습니다. 결제 금액이 다르거나 승인이 거절되었습니다.";
+        }
+        if ("CANCELED".equals(status)) {
+            return "취소된 주문입니다. 결제된 금액이 있다면 자동으로 취소됩니다.";
+        }
+        if ("EXPIRED".equals(status)) {
+            return "결제 시간이 만료된 주문입니다. 다시 결제해주세요.";
+        }
+        if ("UNKNOWN".equals(status)) {
+            return "결제 결과를 확인하고 있습니다. 잠시 후 다시 확인해주세요.";
+        }
+        return "결제를 완료할 수 없습니다.";
+    }
+
+    // 이 Controller 안에서 난 예외는 Whitelabel 에러 페이지 대신 실패 화면으로 보여줌
+
+    // 주문 정보가 없을 때 (잘못된 orderId)
+    @ExceptionHandler(NoSuchElementException.class)
+    public String handleNotFound(NoSuchElementException e, Model model) {
+        model.addAttribute("message", e.getMessage());
+        return "payment-fail";
+    }
+
+    // 파라미터 누락, 숫자 자리에 문자 입력 등 그 밖의 모든 예외
+    @ExceptionHandler(Exception.class)
+    public String handleException(Exception e, Model model) {
+        System.out.println("결제 페이지 오류: " + e.getMessage());
+        model.addAttribute("message", "잘못된 접근이거나 결제 처리 중 오류가 발생했습니다.");
         return "payment-fail";
     }
 }
