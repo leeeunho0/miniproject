@@ -25,20 +25,28 @@ public class PaymentService {
     @Value("${toss.secret-key}")
     private String secretKey;
 
-    // 결제 준비: 금액은 화면이 아니라 "서버가 DB 가격으로" 정한다
-    public PaymentPrepareResponse prepare(Long hotelId) {
+    // 결제 준비: 1박 가격은 DB에서 가져오고, 총액은 서버가 박수를 곱해서 계산한다
+    public PaymentPrepareResponse prepare(Long hotelId, int nights) {
 
         // 숙소가 없으면 예외 발생
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new NoSuchElementException("숙소 없음: " + hotelId));
 
-        // 숙소 가격을 결제 금액으로 사용 (지금은 1박 기준)
-        Double amount = hotel.getPrice();
+        // 박수가 1보다 작게 들어오면 1박으로 처리
+        if (nights < 1) {
+            nights = 1;
+        }
+
+        // 결제 금액 = DB의 1박 가격 × 박수
+        Double amount = hotel.getPrice() * nights;
 
         // save(): DB에 저장하고, id가 채워진 객체를 돌려줌
         Payment payment = paymentRepository.save(new Payment(hotel, amount));
 
-        return new PaymentPrepareResponse(payment.getOrderId(), hotel.getName(), payment.getAmount());
+        // 결제창에 보일 이름: "해운대 오션뷰 (2박)"
+        String orderName = hotel.getName() + " (" + nights + "박)";
+
+        return new PaymentPrepareResponse(payment.getOrderId(), orderName, payment.getAmount());
     }
 
     // 결제 승인: 금액 검증 → 토스 승인 API 호출 → 상태 저장
@@ -89,7 +97,8 @@ public class PaymentService {
 
         return paymentRepository.save(payment);
     }
-        // 테스트 결제: 토스 승인 API 없이 금액 검증 후 바로 DONE 처리 (인증 없이 흐름 확인용)
+
+    // 테스트 결제: 토스 승인 API 없이 금액 검증 후 바로 DONE 처리 (인증 없이 흐름 확인용)
     public Payment mockConfirm(String orderId, long amount) {
 
         // 결제 준비 때 저장한 주문 정보 조회

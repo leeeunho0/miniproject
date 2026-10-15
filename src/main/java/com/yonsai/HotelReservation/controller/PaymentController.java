@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -14,10 +15,11 @@ public class PaymentController {
 
   private final PaymentService paymentService;
 
-  // POST /payments/prepare/3 → 3번 숙소의 주문 정보(READY) 저장 후 orderId, 금액 반환
+  // POST /payments/prepare/3?nights=2 → 3번 숙소 2박의 주문 정보(READY) 저장 후 orderId, 금액 반환
   @PostMapping("/payments/prepare/{hotelId}")
-  public ResponseEntity<PaymentPrepareResponse> prepare(@PathVariable Long hotelId) {
-    PaymentPrepareResponse response = paymentService.prepare(hotelId);
+  public ResponseEntity<PaymentPrepareResponse> prepare(@PathVariable Long hotelId,
+                                                        @RequestParam int nights) {
+    PaymentPrepareResponse response = paymentService.prepare(hotelId, nights);
     return ResponseEntity.status(200).body(response);
   }
 }

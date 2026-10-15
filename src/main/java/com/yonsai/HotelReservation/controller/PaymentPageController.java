@@ -20,10 +20,13 @@ public class PaymentPageController {
     @Value("${toss.client-key}")
     private String clientKey;
 
-    // GET /payment/1 → 1번 숙소 결제 페이지
+    // GET /payment/1?nights=2 → 1번 숙소 2박 결제 페이지
     @GetMapping("/payment/{hotelId}")
-    public String paymentPage(@PathVariable Long hotelId, Model model) {
+    public String paymentPage(@PathVariable Long hotelId,
+                              @RequestParam int nights,
+                              Model model) {
         model.addAttribute("hotelId", hotelId);     // 결제 준비 API 호출에 사용
+        model.addAttribute("nights", nights);       // 결제 준비 API에 박수 전달
         model.addAttribute("clientKey", clientKey); // 토스 결제창 초기화에 사용
         return "payment";
     }
@@ -52,7 +55,8 @@ public class PaymentPageController {
         model.addAttribute("message", message);
         return "payment-fail";
     }
-        // 테스트 결제 완료 주소 (orderId, amount가 함께 옴)
+
+    // 테스트 결제 완료 주소 (orderId, amount가 함께 옴)
     @GetMapping("/payment/test-success")
     public String testSuccess(@RequestParam String orderId,
                               @RequestParam long amount,
