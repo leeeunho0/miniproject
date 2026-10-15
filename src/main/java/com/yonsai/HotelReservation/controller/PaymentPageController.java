@@ -23,6 +23,14 @@ public class PaymentPageController {
     @Value("${toss.client-key}")
     private String clientKey;
 
+    // GET /payment/list → 결제 내역 페이지 (주문 상태 확인용)
+    // 주소가 정확히 일치하는 /payment/list가 /payment/{hotelId}보다 먼저 선택됨
+    @GetMapping("/payment/list")
+    public String paymentList(Model model) {
+        model.addAttribute("payments", paymentService.findAll());
+        return "payment-list";
+    }
+
     // GET /payment/1?nights=2 → 1번 숙소 2박 결제 페이지
     @GetMapping("/payment/{hotelId}")
     public String paymentPage(@PathVariable Long hotelId,

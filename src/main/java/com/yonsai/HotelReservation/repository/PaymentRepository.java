@@ -18,4 +18,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
   // WHERE status = ?  → 결과 확인이 필요한(UNKNOWN) 주문 목록
   List<Payment> findByStatus(String status);
+
+  // ORDER BY id DESC → 최근 결제가 맨 위에 오도록 전체 목록 조회
+  List<Payment> findAllByOrderByIdDesc();
 }

@@ -1,0 +1,65 @@
+/* 결제 내역 페이지: payment.css의 카드보다 넓게 */
+.list-main {
+  width: min(100%, 960px);
+}
+
+/* 표가 화면보다 넓으면 표 안에서만 가로 스크롤 */
+.table-wrap {
+  overflow-x: auto;
+  border-top: 1px solid #e7ece7;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+th {
+  padding: 12px 10px;
+  color: #66736a;
+  font-weight: 500;
+  text-align: left;
+  border-bottom: 1px solid #e7ece7;
+}
+
+td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #eef2ee;
+}
+
+tbody tr:hover { background: #f7faf7; }
+
+.amount { font-weight: 700; color: #276640; }
+
+.order-id {
+  color: #8a958d;
+  font-family: monospace;
+  cursor: help;
+}
+
+/* 상태 배지: 기본 모양 */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #eef1ee;
+  color: #5c665f;
+}
+
+/* 상태별 색상 (th:classappend로 붙은 상태값 class) */
+.badge.DONE     { background: #e3f1e6; color: #276640; }
+.badge.READY    { background: #eef1f6; color: #4a5a78; }
+.badge.FAILED   { background: #fbe9e7; color: #b23c2a; }
+.badge.CANCELED { background: #f1eeea; color: #7a6a58; }
+.badge.EXPIRED  { background: #f0f0f0; color: #8a8a8a; }
+.badge.UNKNOWN  { background: #fdf3dc; color: #9a6b00; }
+
+.empty {
+  padding: 40px 0;
+  color: #8a958d;
+  text-align: center;
+}
